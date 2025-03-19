@@ -1,9 +1,9 @@
 from typing import Tuple, Dict
 import os
-import requests
-import streamlit as st
-import json
 from dotenv import load_dotenv
+import requests
+import json
+import streamlit as st
 from openai import OpenAI
 
 # Load environment variables
