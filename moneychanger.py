@@ -1,5 +1,4 @@
 from typing import Tuple, Dict
-import dotenv
 import os
 import requests
 import streamlit as st
