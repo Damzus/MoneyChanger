@@ -41,6 +41,39 @@ def get_exchange_rate(base: str, target: str, amount: float) -> Tuple:
 def call_llm(textbox_input: str) -> Dict:
     """Make a call to the LLM with the textbox_input as the prompt.
        The output from the LLM should be a JSON (dict) with the base, amount and target"""
+    
+    tools = [{
+                "type": "function",
+                "function": {
+                    "name": "exhange_rate_function",
+                    "description": "Convert a given amount of money from one currency to another. Each currency will be represented as a 3 letter code",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "base": {
+                                "type": "string",
+                                "description": "The base or original currency."
+                            },
+                            "target": {
+                                "type": "string",
+                                "description": "The targert or converted currency."
+                            },
+                            "amount": {
+                                "type": "string",
+                                "description": "The amount of money to convert from the base currency."
+                            }
+                        },
+                        "required": [
+                            "base",
+                            "target",
+                            "amount"
+                        ],
+                        "additionalProperties": False
+                    },
+                    "strict": True
+                }
+            }]
+
     try:
         response = client.chat.completions.create(
             messages=[
@@ -56,29 +89,32 @@ def call_llm(textbox_input: str) -> Dict:
             temperature=1.0,
             top_p=1.0,
             max_tokens=1000,
-            model=model_name
+            model=model_name,
+            tools=tools
         )
-        return response.choices[0].message.content
+        return response#.choices[0].message.content
     except Exception as e:
         st.error(f"Exception {e} for input: {textbox_input}")
         return None
 
-def run_pipeline(user_input: str):
-    """Based on user_input, call the necessary functions for the LLM and exchange rates."""
-    # For this example, let's assume user_input is like: "Convert 100 USD to EUR"
-    parts = user_input.split()
-    if len(parts) == 5 and parts[0].lower() == 'convert':
-        amount = float(parts[1])
-        base_currency = parts[2].upper()
-        target_currency = parts[4].upper()
-        
-        exchange_response = get_exchange_rate(base_currency, target_currency, amount)
-        if exchange_response:
-            st.write(f'{amount} {base_currency} is {exchange_response[3]} {target_currency}')
-    else:
-        llm_response = call_llm(user_input)
-        st.write("Response from LLM:", llm_response)
+def run_pipeline(user_input):
+    """Based on textbox_input, determine if you need to use the tools (function calling) for the LLM.
+    Call get_exchange_rate(...) if necessary"""
 
+    response = call_llm(user_input)
+    #st.write(response)
+    if response.choices[0].finish_reason == "tool_calls":
+        response_arguments = json.loads(response.choices[0].message.tool_calls[0].function.arguments)
+        base = response_arguments["base"]
+        target = response_arguments["target"]
+        amount = response_arguments["amount"]
+        _, _, _, conversion_result = get_exchange_rate(base, target, amount)
+        st.write(f'{base} {amount} is {target} {conversion_result}')
+    elif response.choices[0].finish_reason == "stop":
+        # Update this
+        st.write(f"(Function calling not used) and {response.choices[0].message.content}")
+    else:
+        st.write("NotImplemented")
 # Title of the application
 st.title("Multilingual Money Changer")
 
