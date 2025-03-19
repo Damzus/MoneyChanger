@@ -1,9 +1,11 @@
 from typing import Tuple, Dict
+import dotenv
 import os
 from dotenv import load_dotenv
 import requests
 import json
 import streamlit as st
+import os
 from openai import OpenAI
 
 # Load environment variables
