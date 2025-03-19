@@ -1,6 +1,6 @@
-# Joke Explainer
+# Multilingual Money Changer
 
-Joke Explainer is a simple web application built with Streamlit that allows users to input a joke and receive an explanation for it using the OpenAI GPT model. The app aims to help users understand the nuances of humor and the craft of joke-telling.
+Multilingual Money Changer is a simple web application built with Streamlit that allows users to input a joke and receive an explanation for it using the OpenAI GPT model. The app aims to help users understand the nuances of humor and the craft of joke-telling.
 
 ## Features
 
@@ -31,4 +31,4 @@ To add this README to your project:
 2. Copy the above content and paste it into the `README.md` file.
 3. Save the file.
 
-This README will provide a clear and concise overview of your project, helping others to understand and interact with your Joke Explainer app effectively.
+This README will provide a clear and concise overview of your project, helping others to understand and interact with your Multilingual Money Changer app effectively.
